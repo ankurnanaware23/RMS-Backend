@@ -93,10 +93,16 @@ class PasswordResetEmailVerifyAPIView(generics.GenericAPIView):
         )
 
         msg.attach_alternative(html_body, "text/html")
-        msg.send()
+        
+        try:
+            msg.send()
+        except Exception as e:
+            print("Email sending failed:", str(e))
 
-        return Response({"detail": "Password reset OTP has been sent to your email."}, status=status.HTTP_200_OK)
-
+        return Response(
+            {"detail": "Password reset OTP has been sent to your email."},
+            status=status.HTTP_200_OK
+        )
 
 class OTPVerificationAPIView(generics.GenericAPIView):
     permission_classes = [AllowAny]
@@ -148,7 +154,10 @@ class PasswordChangeAPIView(generics.CreateAPIView):
             )
 
             msg.attach_alternative(html_body, "text/html")
-            msg.send()
+            try:
+                msg.send()
+            except Exception as e:
+                print("Email sending failed:", str(e))
 
             return Response({"detail": "Password reset successful."}, status=status.HTTP_201_CREATED)
 
