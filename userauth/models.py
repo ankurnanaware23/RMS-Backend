@@ -44,7 +44,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 # Signal to save user profile when User instance is saved
 def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+    Profile.objects.get_or_create(user=instance)
 
 # Connecting the signals
 post_save.connect(create_user_profile, sender=User)

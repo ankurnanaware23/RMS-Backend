@@ -298,12 +298,24 @@ SIMPLE_JWT = {
 }
 
 # CORS (set DJANGO_CORS_ALLOW_ALL=true for local dev)
-CORS_ALLOW_ALL_ORIGINS = env.bool("DJANGO_CORS_ALLOW_ALL", default=True)
+CORS_ALLOW_ALL_ORIGINS = env.bool("DJANGO_CORS_ALLOW_ALL", default=False)
 
+CORS_ALLOWED_ORIGINS = env.list(
+    "DJANGO_CORS_ALLOWED_ORIGINS",
+    default=[
+        "https://rms-frontend-ankur-nanawares-projects.vercel.app",
+        "https://rms-frontend-ochre.vercel.app",
+        "https://rms-frontend-git-main-ankur-nanawares-projects.vercel.app",
+        "https://rms-frontend-3znqzsb1g-ankur-nanawares-projects.vercel.app",
+    ],
+)
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://rms-frontend-ankur-nanawares-projects.vercel.app",
-    "https://rms-frontend-ochre.vercel.app",
-    "https://rms-frontend-git-main-ankur-nanawares-projects.vercel.app",
-    "https://rms-frontend-3znqzsb1g-ankur-nanawares-projects.vercel.app"
-]
+CSRF_TRUSTED_ORIGINS = env.list(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    default=[
+        "https://rms-frontend-ankur-nanawares-projects.vercel.app",
+        "https://rms-frontend-ochre.vercel.app",
+        "https://rms-frontend-git-main-ankur-nanawares-projects.vercel.app",
+        "https://rms-frontend-3znqzsb1g-ankur-nanawares-projects.vercel.app",
+    ],
+)

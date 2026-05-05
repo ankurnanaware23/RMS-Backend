@@ -154,10 +154,20 @@ class PasswordChangeAPIView(generics.CreateAPIView):
             )
 
             msg.attach_alternative(html_body, "text/html")
+            # try:
+            #     msg.send()
+            # except Exception as e:
+            #     print("Email sending failed:", str(e))
+
+            # this is used for debuging purpose
             try:
-                msg.send()
+                msg.send(fail_silently=False)
             except Exception as e:
-                print("Email sending failed:", str(e))
+                return Response(
+                    {"detail": f"Email sending failed: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+
 
             return Response({"detail": "Password reset successful."}, status=status.HTTP_201_CREATED)
 
