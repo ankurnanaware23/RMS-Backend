@@ -164,6 +164,14 @@ EMAIL_USE_TLS       = env.bool("EMAIL_USE_TLS", default=True)
 EMAIL_HOST_USER     = env.str("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL  = env.str("DEFAULT_FROM_EMAIL", default="no-reply@example.com")
+EMAIL_TIMEOUT       = env.int("EMAIL_TIMEOUT", default=10)
+
+# Brevo HTTPS email API. Use this on Render free tier instead of SMTP ports.
+BREVO_API_KEY      = env.str("BREVO_API_KEY", default="")
+BREVO_FROM_EMAIL   = env.str("BREVO_FROM_EMAIL", default=EMAIL_HOST_USER)
+BREVO_FROM_NAME    = env.str("BREVO_FROM_NAME", default="DineEase")
+BREVO_API_URL      = env.str("BREVO_API_URL", default="https://api.brevo.com/v3/smtp/email")
+
 
 
 ANYMAIL = {

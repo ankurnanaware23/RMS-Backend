@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
+import requests
 import pytz
 
 from api import serializers as api_serializers
@@ -62,6 +63,40 @@ def generate_otp(length):
     return otp
 
 
+def send_transactional_email(subject, to_email, text_body, html_body):
+    if settings.BREVO_API_KEY:
+        response = requests.post(
+            settings.BREVO_API_URL,
+            headers={
+                "accept": "application/json",
+                "api-key": settings.BREVO_API_KEY,
+                "Content-Type": "application/json",
+            },
+            json={
+                "sender": {
+                    "name": settings.BREVO_FROM_NAME,
+                    "email": settings.BREVO_FROM_EMAIL,
+                },
+                "to": [{"email": to_email}],
+                "subject": subject,
+                "htmlContent": html_body,
+                "textContent": text_body,
+            },
+            timeout=settings.EMAIL_TIMEOUT,
+        )
+        response.raise_for_status()
+        return
+
+    msg = EmailMultiAlternatives(
+        subject=subject,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[to_email],
+        body=text_body
+    )
+    msg.attach_alternative(html_body, "text/html")
+    msg.send(fail_silently=False)
+
+
 class PasswordResetEmailVerifyAPIView(generics.GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = api_serializers.UserSerializer
@@ -85,22 +120,8 @@ class PasswordResetEmailVerifyAPIView(generics.GenericAPIView):
         text_body = render_to_string('email/password_reset.txt', context)
         html_body = render_to_string('email/password_reset.html', context)
 
-        msg = EmailMultiAlternatives(
-            subject=subject,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[user.email],
-            body=text_body
-        )
-
-        msg.attach_alternative(html_body, "text/html")
-        
-        # try:
-        #     msg.send()
-        # except Exception as e:
-        #     print("Email sending failed:", str(e))
-
         try:
-            msg.send(fail_silently=False)
+            send_transactional_email(subject, user.email, text_body, html_body)
         except Exception as e:
             return Response(
                 {"detail": f"Email sending failed: {str(e)}"},
@@ -155,22 +176,8 @@ class PasswordChangeAPIView(generics.CreateAPIView):
             text_body = render_to_string('email/password_changed.txt', context)
             html_body = render_to_string('email/password_changed.html', context)
 
-            msg = EmailMultiAlternatives(
-                subject=subject,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=[user.email],
-                body=text_body
-            )
-
-            msg.attach_alternative(html_body, "text/html")
-            # try:
-            #     msg.send()
-            # except Exception as e:
-            #     print("Email sending failed:", str(e))
-
-            # this is used for debuging purpose
             try:
-                msg.send(fail_silently=False)
+                send_transactional_email(subject, user.email, text_body, html_body)
             except Exception as e:
                 return Response(
                     {"detail": f"Email sending failed: {str(e)}"},
