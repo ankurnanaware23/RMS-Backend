@@ -122,12 +122,11 @@ class PasswordResetEmailVerifyAPIView(generics.GenericAPIView):
 
         try:
             send_transactional_email(subject, user.email, text_body, html_body)
-        except Exception as e:
+        except Exception:
             return Response(
-                {"detail": f"Email sending failed: {str(e)}"},
+                {"detail": "Unable to send email right now. Please try again later."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-
 
         return Response(
             {"detail": "Password reset OTP has been sent to your email."},
@@ -178,9 +177,9 @@ class PasswordChangeAPIView(generics.CreateAPIView):
 
             try:
                 send_transactional_email(subject, user.email, text_body, html_body)
-            except Exception as e:
+            except Exception:
                 return Response(
-                    {"detail": f"Email sending failed: {str(e)}"},
+                    {"detail": "Unable to send email right now. Please try again later."},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
 
